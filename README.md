@@ -22,13 +22,62 @@ To integrate the Segment Tree into my React application, I first created a utili
 
 I first initialized a Segment Tree by segmenting the volume data available from the stock. These are stored along with aggregated values, like sums, at each node. The process constructs a tree representing the entire range of data so that each parent node covers a broader range than its children.
 
+```javascript
+
+static build(nums, L, R) {
+if (L === R) {
+return new SegmentTree(nums[L],L,R);
+}
+const M = Math.floor((L + R) / 2);
+const root = new SegmentTree(0, L, R);
+root.left = build(nums, L, M);
+root.right = SegmentTree.build(nums, M + 1, R
+root.sum = root.left.sum + root.right.sum
+return root;
+}
+
 ### Querying the Tree
 
 After that, I could efficiently query any range of stock data. Because of the tree's structure, it is possible to skip large parts of the data not relevant to a query; hence, this makes the process a lot faster than an iteration over the complete dataset.
 
+```javascript
+
+rangeQuery(l, r)
+if (L === this.L && R === this.R) {
+return this.sum;
+}
+const M = Math.floor((this.L + this.R)/2)
+if (L > M) {
+return this.right.rangeQuery(L
+} else if ( R<= M ) {
+return this.left.rangeQuery(L
+} else {
+return this.left.rangeQuery(L, M) + this.right.rangeQuery(M + 1, R);
+}
+it
+```
+
 ### Updates in the Tree
 
 Given that changes in the data had occurred, a Segment Tree could be updated in logarithmic time to maintain the accuracy of the tree, rather than having to rebuild from scratch.
+
+```javascript
+
+update(index, value) {
+if(this.L === this.R) {
+this.sum = val;
+return;
+}
+const M = (this.L + this.R) // 2 ;
+if(index > M)
+this.right.update(index, val);
+} else {
+this.left.update(index, val);
+}
+
+this.sum = this.left.sum + this.right.sum
+
+}
 
 
 ### Key Features:
