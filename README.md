@@ -34,5 +34,5 @@ You can view a live, working version of the optimized stock data visualization a
 
 ## Conclusion
 
-This project demonstrates the value of revisiting old projects with a fresh perspective. Implementing the Segment Tree significantly improved the app's performance and prepared it for long-term reprovisioning.
+This project demonstrates the value of revisiting old projects with a fresh perspective. The original scaffolding laid a fundamental foundation for my work, and it made all of the difference. Implementing the Segment Tree significantly improved the app's performance and prepared it for long-term reprovisioning.
 
