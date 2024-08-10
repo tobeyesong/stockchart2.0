@@ -35,7 +35,7 @@ root.right = SegmentTree.build(nums, M + 1, R
 root.sum = root.left.sum + root.right.sum
 return root;
 }
-
+```
 ### Querying the Tree
 
 After that, I could efficiently query any range of stock data. Because of the tree's structure, it is possible to skip large parts of the data not relevant to a query; hence, this makes the process a lot faster than an iteration over the complete dataset.
