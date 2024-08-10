@@ -18,7 +18,7 @@ Not too dissimilar to merge sort, the idea here is to break up the array into se
 
 ## Algolia Integration
 
-Initially, I considered implementing a complex system to update the Algolia index in real-time. However, I opted for a simpler solution: generating a JSON file with a single API call and then uploading it to Algolia. This process effectively created a makeshift database for all ticker symbols.
+Initially, I considered implementing a convoluted system to update the Algolia index in real-time. However, I opted for a simpler solution: generating a JSON file with a single API call and then uploading it to Algolia. This process effectively created a makeshift database for all ticker symbols.
 
 ## Performance Comparison
 
