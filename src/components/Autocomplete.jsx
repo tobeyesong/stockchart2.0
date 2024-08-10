@@ -1,26 +1,16 @@
-// src/components/Autocomplete.jsx
-
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { connectAutoComplete } from 'react-instantsearch-dom';
-import StockData from './StockData';
-import fetchAlphaVantageData from '../utils/fetchAplhaVantageData';
 
-const Autocomplete = ({ hits, currentRefinement, refine }) => {
+const Autocomplete = ({ hits, currentRefinement, refine, onSelectSymbol }) => {
   const [inputValue, setInputValue] = useState(currentRefinement);
   const [showHits, setShowHits] = useState(true);
-  const [stockData, setStockData] = useState(null);
 
-  const handleSelect = async (hit) => {
+  const handleSelect = (hit) => {
     setInputValue(hit.symbol);
     setShowHits(false);
     refine(hit.symbol);
-
-    try {
-      const data = await fetchAlphaVantageData(hit.symbol);
-      setStockData(data);
-    } catch (error) {
-      console.error("Error fetching Alpha Vantage data:", error);
-    }
+    onSelectSymbol(hit.symbol);
   };
 
   const handleChange = (event) => {
@@ -40,7 +30,7 @@ const Autocomplete = ({ hits, currentRefinement, refine }) => {
         onFocus={() => setShowHits(true)}
         style={{ padding: '10px', width: '300px', marginBottom: '20px' }}
       />
-      {inputValue && hits.length > 0 && showHits && (
+      {inputValue && Array.isArray(hits) && hits.length > 0 && showHits && (
         <ul style={{ listStyleType: 'none', padding: 0 }}>
           {hits.slice(0, 5).map(hit => (
             <li
@@ -57,9 +47,21 @@ const Autocomplete = ({ hits, currentRefinement, refine }) => {
           ))}
         </ul>
       )}
-      <StockData data={stockData} />
     </div>
   );
+};
+
+Autocomplete.propTypes = {
+  hits: PropTypes.arrayOf(
+    PropTypes.shape({
+      objectID: PropTypes.string.isRequired,
+      symbol: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+  currentRefinement: PropTypes.string.isRequired,
+  refine: PropTypes.func.isRequired,
+  onSelectSymbol: PropTypes.func.isRequired,
 };
 
 export default connectAutoComplete(Autocomplete);

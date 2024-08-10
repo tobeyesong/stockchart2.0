@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import { useState, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import LineChartSection from './LineChartSection';
-
+import SegmentTree from '../utils/segmentTree'; 
 const StockData = ({ data }) => {
   const [selectedPeriod, setSelectedPeriod] = useState('monthly');
 
-  if (!data) {
-    return <div>No data available</div>;
-  }
+  const chartData = useMemo(() => {
+    if (!data) return [];
 
-  const getChartData = () => {
     let seriesData;
     let smaData;
   
@@ -40,9 +39,19 @@ const StockData = ({ data }) => {
       date: item.date,
       close: item.close,
       sma: smaMap.get(item.date) || null,
-      volume: item.volume, // Make sure this is included
+      volume: item.volume,
     }));
-  };
+  }, [data, selectedPeriod]);
+
+  const volumeTree = useMemo(() => {
+    if (chartData.length === 0) return null;
+    const volumes = chartData.map(item => item.volume);
+    return SegmentTree.build(volumes, 0, volumes.length - 1);
+  }, [chartData]);
+
+  if (!data) {
+    return <div>No data available</div>;
+  }
 
   const ButtonStyle = ({ isSelected }) => ({
     marginRight: '10px',
@@ -76,9 +85,50 @@ const StockData = ({ data }) => {
         ))}
       </div>
 
-      <LineChartSection chartData={getChartData()} />
+      {volumeTree && <LineChartSection chartData={chartData} volumeTree={volumeTree} />}
     </div>
   );
+};
+
+StockData.propTypes = {
+  data: PropTypes.shape({
+    previousClose: PropTypes.number,
+    weekRange: PropTypes.string,
+    volume: PropTypes.number,
+    changePercent: PropTypes.string,
+    dailySeries: PropTypes.arrayOf(PropTypes.shape({
+      date: PropTypes.string.isRequired,
+      close: PropTypes.number.isRequired,
+      volume: PropTypes.number.isRequired,
+    })),
+    weeklySeries: PropTypes.arrayOf(PropTypes.shape({
+      date: PropTypes.string.isRequired,
+      close: PropTypes.number.isRequired,
+      volume: PropTypes.number.isRequired,
+    })),
+    monthlySeries: PropTypes.arrayOf(PropTypes.shape({
+      date: PropTypes.string.isRequired,
+      close: PropTypes.number.isRequired,
+      volume: PropTypes.number.isRequired,
+    })),
+    yearlySeries: PropTypes.arrayOf(PropTypes.shape({
+      date: PropTypes.string.isRequired,
+      close: PropTypes.number.isRequired,
+      volume: PropTypes.number.isRequired,
+    })),
+    smaDaily: PropTypes.arrayOf(PropTypes.shape({
+      date: PropTypes.string.isRequired,
+      sma: PropTypes.number.isRequired,
+    })),
+    smaWeekly: PropTypes.arrayOf(PropTypes.shape({
+      date: PropTypes.string.isRequired,
+      sma: PropTypes.number.isRequired,
+    })),
+    smaMonthly: PropTypes.arrayOf(PropTypes.shape({
+      date: PropTypes.string.isRequired,
+      sma: PropTypes.number.isRequired,
+    })),
+  }),
 };
 
 export default StockData;

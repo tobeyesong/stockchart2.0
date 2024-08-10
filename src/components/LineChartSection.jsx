@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   ComposedChart,
@@ -10,95 +10,69 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  ReferenceArea,
 } from 'recharts';
+import SegmentTree from '../utils/segmentTree';  // Make sure this path is correct
 
-const LineChartSection = ({ chartData }) => {
-  const [left, setLeft] = useState('dataMin');
-  const [right, setRight] = useState('dataMax');
-  const [refAreaLeft, setRefAreaLeft] = useState('');
-  const [refAreaRight, setRefAreaRight] = useState('');
-  const [top, setTop] = useState('dataMax+1');
-  const [bottom, setBottom] = useState('dataMin-1');
+const LineChartSection = ({ chartData, volumeTree }) => {
+  const [avgVolume, setAvgVolume] = useState(null);
+
+  useEffect(() => {
+    if (chartData && chartData.length > 0 && volumeTree) {
+      calculateAverageVolume(0, chartData.length - 1);
+    }
+  }, [chartData, volumeTree]);
+
+  const calculateAverageVolume = (start, end) => {
+    console.time('Segment Tree Query');
+    const segmentTreeVolume = volumeTree.rangeQuery(start, end);
+    const segmentTreeAvg = segmentTreeVolume / (end - start + 1);
+    console.timeEnd('Segment Tree Query');
+
+    console.time('Naive Query');
+    let naiveVolume = 0;
+    for (let i = start; i <= end; i++) {
+      naiveVolume += chartData[i].volume;
+    }
+    const naiveAvg = naiveVolume / (end - start + 1);
+    console.timeEnd('Naive Query');
+
+    console.log('Segment Tree Average:', segmentTreeAvg);
+    console.log('Naive Average:', naiveAvg);
+
+    setAvgVolume(segmentTreeAvg);
+  };
+
+  const handleMouseMove = (e) => {
+    if (e && e.activeTooltipIndex !== undefined) {
+      calculateAverageVolume(0, e.activeTooltipIndex);
+    }
+  };
 
   if (!chartData || chartData.length === 0) {
     return <div>No data available for the selected time period.</div>;
   }
 
-  const getAxisYDomain = (from, to, ref, offset) => {
-    const refData = chartData.slice(from, to);
-    let [bottom, top] = [refData[0][ref], refData[0][ref]];
-    refData.forEach((d) => {
-      if (d[ref] > top) top = d[ref];
-      if (d[ref] < bottom) bottom = d[ref];
-    });
-
-    return [(bottom | 0) - offset, (top | 0) + offset];
-  };
-
-  const zoom = () => {
-    if (refAreaLeft === refAreaRight || refAreaRight === '') {
-      setRefAreaLeft('');
-      setRefAreaRight('');
-      return;
-    }
-
-    let leftIndex = chartData.findIndex(item => item.date === refAreaLeft);
-    let rightIndex = chartData.findIndex(item => item.date === refAreaRight);
-
-    if (leftIndex > rightIndex) 
-      [leftIndex, rightIndex] = [rightIndex, leftIndex];
-
-    const [bottomDomain, topDomain] = getAxisYDomain(leftIndex, rightIndex, 'close', 1);
-
-    setRefAreaLeft('');
-    setRefAreaRight('');
-    setLeft(chartData[leftIndex].date);
-    setRight(chartData[rightIndex].date);
-    setBottom(bottomDomain);
-    setTop(topDomain);
-  };
-
-  const zoomOut = () => {
-    setLeft('dataMin');
-    setRight('dataMax');
-    setTop('dataMax+1');
-    setBottom('dataMin-1');
-    setRefAreaLeft('');
-    setRefAreaRight('');
-  };
-
   return (
     <div className="highlight-bar-charts" style={{ userSelect: 'none', width: '100%' }}>
-      <button type="button" className="btn update" onClick={zoomOut}>
-        Zoom Out
-      </button>
+      <p>Average Volume: {avgVolume ? avgVolume.toFixed(2) : 'N/A'}</p>
 
       <ResponsiveContainer width="100%" height={400}>
         <ComposedChart
           data={chartData}
-          onMouseDown={(e) => e && setRefAreaLeft(e.activeLabel)}
-          onMouseMove={(e) => e && refAreaLeft && setRefAreaRight(e.activeLabel)}
-          onMouseUp={zoom}
+          onMouseMove={handleMouseMove}
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis 
-            allowDataOverflow
             dataKey="date"
-            domain={[left, right]}
             type="category"
             tick={{ fontSize: 12 }}
           />
           <YAxis 
-            allowDataOverflow
-            domain={[bottom, top]}
             type="number"
             yAxisId="price"
             orientation="left"
           />
           <YAxis 
-            allowDataOverflow
-            domain={['auto', 'auto']}
             type="number"
             yAxisId="volume"
             orientation="right"
@@ -129,9 +103,6 @@ const LineChartSection = ({ chartData }) => {
             dot={false}
             strokeDasharray="5 5"
           />
-          {refAreaLeft && refAreaRight ? (
-            <ReferenceArea yAxisId="price" x1={refAreaLeft} x2={refAreaRight} strokeOpacity={0.3} />
-          ) : null}
         </ComposedChart>
       </ResponsiveContainer>
     </div>
@@ -147,6 +118,7 @@ LineChartSection.propTypes = {
       volume: PropTypes.number.isRequired,
     })
   ).isRequired,
+  volumeTree: PropTypes.instanceOf(SegmentTree).isRequired,
 };
 
 export default LineChartSection;
