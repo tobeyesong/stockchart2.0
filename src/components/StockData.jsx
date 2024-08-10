@@ -2,8 +2,10 @@ import { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import LineChartSection from './LineChartSection';
 import SegmentTree from '../utils/segmentTree'; 
+import StockStats from './StockStats';
+
 const StockData = ({ data }) => {
-  const [selectedPeriod, setSelectedPeriod] = useState('monthly');
+  const [selectedPeriod, setSelectedPeriod] = useState('weekly');
 
   const chartData = useMemo(() => {
     if (!data) return [];
@@ -12,10 +14,6 @@ const StockData = ({ data }) => {
     let smaData;
   
     switch (selectedPeriod) {
-      case 'daily':
-        seriesData = data.dailySeries || [];
-        smaData = data.smaDaily || [];
-        break;
       case 'weekly':
         seriesData = data.weeklySeries || [];
         smaData = data.smaWeekly || [];
@@ -29,8 +27,8 @@ const StockData = ({ data }) => {
         smaData = data.smaMonthly || []; // Use monthly SMA for yearly view
         break;
       default:
-        seriesData = data.dailySeries || [];
-        smaData = data.smaDaily || [];
+        seriesData = data.weeklySeries || [];
+        smaData = data.smaWeekly || [];
     }
   
     const smaMap = new Map(smaData.map(item => [item.date, item.sma]));
@@ -65,13 +63,14 @@ const StockData = ({ data }) => {
 
   return (
     <div>
-      <h2>Stock Information</h2>
-      <p><strong>Previous Close:</strong> ${data.previousClose || 'N/A'}</p>
-      <p><strong>52 Week Range:</strong> {data.weekRange || 'N/A'}</p>
-      <p><strong>Volume:</strong> {data.volume || 'N/A'}</p>
-      <p><strong>Change Percent:</strong> {data.changePercent || 'N/A'}</p>
+      <StockStats 
+        
+        previousClose={data.previousClose}
+        volume={data.volume}
+        changePercent={data.changePercent}
+      />
 
-      <h3>Price Chart</h3>
+     
 
       <div style={{ marginBottom: '20px' }}>
         {['weekly', 'monthly', 'yearly'].map((period) => (
@@ -85,7 +84,13 @@ const StockData = ({ data }) => {
         ))}
       </div>
 
-      {volumeTree && <LineChartSection chartData={chartData} volumeTree={volumeTree} />}
+      {volumeTree && (
+        <LineChartSection 
+          chartData={chartData} 
+          volumeTree={volumeTree} 
+          selectedPeriod={selectedPeriod}
+        />
+      )}
     </div>
   );
 };
@@ -96,11 +101,6 @@ StockData.propTypes = {
     weekRange: PropTypes.string,
     volume: PropTypes.number,
     changePercent: PropTypes.string,
-    dailySeries: PropTypes.arrayOf(PropTypes.shape({
-      date: PropTypes.string.isRequired,
-      close: PropTypes.number.isRequired,
-      volume: PropTypes.number.isRequired,
-    })),
     weeklySeries: PropTypes.arrayOf(PropTypes.shape({
       date: PropTypes.string.isRequired,
       close: PropTypes.number.isRequired,
@@ -116,10 +116,6 @@ StockData.propTypes = {
       close: PropTypes.number.isRequired,
       volume: PropTypes.number.isRequired,
     })),
-    smaDaily: PropTypes.arrayOf(PropTypes.shape({
-      date: PropTypes.string.isRequired,
-      sma: PropTypes.number.isRequired,
-    })),
     smaWeekly: PropTypes.arrayOf(PropTypes.shape({
       date: PropTypes.string.isRequired,
       sma: PropTypes.number.isRequired,
@@ -129,6 +125,7 @@ StockData.propTypes = {
       sma: PropTypes.number.isRequired,
     })),
   }),
+  symbol: PropTypes.string.isRequired,
 };
 
 export default StockData;
