@@ -20,7 +20,7 @@ Initially, I considered implementing a complex system to update the Algolia inde
 
 ## Performance Comparison
 
-To verify the effectiveness of the Segment Tree, I compared it against the naive approach by measuring elapsed time using `console.time()`. The results were as follows:
+To verify the effectiveness of the Segment Tree, I compared it against the naive approach by measuring elapsed time using `console.time()`. You can view the live result in the console. The results were as follows:
 
 - **Faster Queries**: The range of queries for the Segment Tree method consistently outperformed the naive method, especially for longer data ranges.
 - **Consistent Results**: The average results for both methods were identical, confirming the accuracy of the Segment Tree approach.
