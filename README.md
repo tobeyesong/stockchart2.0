@@ -45,10 +45,13 @@ Initially, I considered implementing a convoluted system to update the Algolia i
 
 Decoupling my components from responsibilities is one way that really helped me build a maintainable and scalable application. 
 
+Here’s the content converted to appropriate markdown with code blocks:
+
 ## Performance Comparison
 
-To verify the effectiveness of the Segment Tree, I compared it against the naive approach by measuring elapsed time using `console.time()` and `console.timeEnd()`. You can view the live result in the console. 
+To verify the effectiveness of the Segment Tree, I compared it against the naive approach by measuring elapsed time using `console.time()` and `console.timeEnd()`. You can view the live result in the console.
 
+```javascript
 console.time('Segment Tree Query');
 const segmentTreeAvg = volumeTree.rangeQuery(start, end) / (end - start + 1);
 console.timeEnd('Segment Tree Query');
@@ -60,14 +63,20 @@ for (let i = start; i <= end; i++) {
 }
 const naiveAvg = sum / (end - start + 1);
 console.timeEnd('Naive Query');
+```
 
-**Logging Results**: After each calculation, I logged the results and execution times:
+### Logging Results
 
+After each calculation, I logged the results and execution times:
+
+```javascript
 console.log('Segment Tree Average:', segmentTreeAvg);
 console.log('Naive Average:', naiveAvg);
+```
 
 By examining the console output, I could compare the execution times of the Segment Tree approach versus the naive approach. Here's an example of the output I observed:
 
+```
 Segment Tree Query: 0.0029296875 ms
 Naive Query: 0.005859375 ms
 Segment Tree Average: 692479790.7441077
@@ -77,8 +86,9 @@ Segment Tree Query: 0.001953125 ms
 Naive Query: 0.005126953125 ms
 Segment Tree Average: 226518506.006734
 Naive Average: 226518506.006734
+```
 
-The results were as follows:
+### Results Summary
 - **Faster Queries**: The Segment Tree method consistently outperformed the naive method in terms of query range, especially for longer data ranges.
 - **Consistent Results**: The average results for both methods were identical, confirming the accuracy of the Segment Tree approach.
 - **Quick Response**: After the initial API call, subsequent queries sped up significantly due to the Segment Tree.
