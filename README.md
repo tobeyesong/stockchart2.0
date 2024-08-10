@@ -78,7 +78,7 @@ this.left.update(index, val);
 this.sum = this.left.sum + this.right.sum
 
 }
-
+```
 
 ### Key Features:
 
