@@ -47,8 +47,38 @@ Decoupling my components from responsibilities is one way that really helped me 
 
 ## Performance Comparison
 
-To verify the effectiveness of the Segment Tree, I compared it against the naive approach by measuring elapsed time using `console.time()`. You can view the live result in the console. The results were as follows:
+To verify the effectiveness of the Segment Tree, I compared it against the naive approach by measuring elapsed time using `console.time()` and `console.timeEnd()`. You can view the live result in the console. 
 
+console.time('Segment Tree Query');
+const segmentTreeAvg = volumeTree.rangeQuery(start, end) / (end - start + 1);
+console.timeEnd('Segment Tree Query');
+
+console.time('Naive Query');
+let sum = 0;
+for (let i = start; i <= end; i++) {
+  sum += chartData[i].volume;
+}
+const naiveAvg = sum / (end - start + 1);
+console.timeEnd('Naive Query');
+
+**Logging Results**: After each calculation, I logged the results and execution times:
+
+console.log('Segment Tree Average:', segmentTreeAvg);
+console.log('Naive Average:', naiveAvg);
+
+By examining the console output, I could compare the execution times of the Segment Tree approach versus the naive approach. Here's an example of the output I observed:
+
+Segment Tree Query: 0.0029296875 ms
+Naive Query: 0.005859375 ms
+Segment Tree Average: 692479790.7441077
+Naive Average: 692479790.7441077
+
+Segment Tree Query: 0.001953125 ms
+Naive Query: 0.005126953125 ms
+Segment Tree Average: 226518506.006734
+Naive Average: 226518506.006734
+
+The results were as follows:
 - **Faster Queries**: The Segment Tree method consistently outperformed the naive method in terms of query range, especially for longer data ranges.
 - **Consistent Results**: The average results for both methods were identical, confirming the accuracy of the Segment Tree approach.
 - **Quick Response**: After the initial API call, subsequent queries sped up significantly due to the Segment Tree.
