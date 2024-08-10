@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project, initially developed a few years ago, focuses on the basic visualization of stock data. Recently, I revisited it with the goal of optimizing the application, especially for handling large datasets. The primary enhancement involves implementing a Segment Tree for volume calculations.
+This project, initially developed a few years ago, focuses on the basic visualization of stock data. I revisited it with the goal of optimizing the application, especially for handling large datasets. The primary enhancement involves implementing a Segment Tree for volume calculations.
 
 ## Segment Tree Implementation
 
